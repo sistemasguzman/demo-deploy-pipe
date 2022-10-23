@@ -7,11 +7,11 @@ phases:
   
   pre_build:
     commands:
-      - dotnet restore $CODEBUILD_SRC_DIR/DemoDeploy/MyDeployApi/MyDeployApi/MyDeployApi.csproj --verbosity minimal
+      - dotnet restore $CODEBUILD_SRC_DIR/MyDeployApi/MyDeployApi/MyDeployApi.csproj --verbosity minimal
 
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/DemoDeploy/MyDeployApi/MyDeployApi/
+      - cd $CODEBUILD_SRC_DIR/MyDeployApi/MyDeployApi/
       - dotnet publish \
           --configuration release \
           --framework net6.0 \
