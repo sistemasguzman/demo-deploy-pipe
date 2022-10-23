@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - /usr/local/bin/dotnet-install.sh -c 6.0
+  
+  pre_build:
+    commands:
+      - dotnet restore $CODEBUILD_SRC_DIR/DemoDeploy/MyDeployApi/MyDeployApi/MyDeployApi.csproj --verbosity minimal
+
+  build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/DemoDeploy/MyDeployApi/MyDeployApi/
+      - dotnet publish \
+          --configuration release \
+          --framework net6.0 \
+          --output ../../MyDeployApi
+
+
+artifacts:
+  base-directory: $CODEBUILD_SRC_DIR
+  files:
+    - '**/*'
