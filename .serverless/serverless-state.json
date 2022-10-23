@@ -1,0 +1,190 @@
+{
+  "service": {
+    "service": "deploy-demo-ec2",
+    "serviceObject": {
+      "name": "deploy-demo-ec2"
+    },
+    "provider": {
+      "name": "aws",
+      "region": "us-east-1",
+      "stackName": "deploy-demo-ec2-dev",
+      "iam": {
+        "deploymentRole": "arn:aws:iam::785082223516:role/GBMAWSCloudFormationExecutionRole"
+      },
+      "stage": "dev",
+      "deploymentBucket": "my-deploy-serverless-code",
+      "deploymentPrefix": "deploy-demo/deploy-demo-ec2",
+      "versionFunctions": true,
+      "deploymentBucketObject": {
+        "name": "my-deploy-serverless-code"
+      },
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "SpeiEC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+              "AvailabilityZone": {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::GetAZs": ""
+                  }
+                ]
+              },
+              "ImageId": "ami-07a53499a088e4a8c",
+              "InstanceType": "t2.micro",
+              "IamInstanceProfile": "EC2InstanceRoleForCodeDeploy",
+              "KeyName": "deploykey",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "DeployDemo"
+                }
+              ],
+              "SecurityGroupIds": [
+                "sg-0efa280a574305fc5"
+              ]
+            }
+          },
+          "DeployApplication": {
+            "Type": "AWS::CodeDeploy::Application",
+            "Properties": {
+              "ApplicationName": "demo-deploy-application",
+              "ComputePlatform": "Server"
+            }
+          },
+          "DeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Properties": {
+              "ApplicationName": {
+                "Ref": "DeployApplication"
+              },
+              "DeploymentGroupName": "demo-deploy-deployment-group",
+              "DeploymentStyle": {
+                "DeploymentOption": "WITHOUT_TRAFFIC_CONTROL",
+                "DeploymentType": "IN_PLACE"
+              },
+              "DeploymentConfigName": "CodeDeployDefault.AllAtOnce",
+              "Ec2TagFilters": [
+                {
+                  "Key": "STAGE",
+                  "Value": "dev",
+                  "Type": "KEY_AND_VALUE"
+                }
+              ],
+              "ServiceRoleArn": "arn:aws:iam::785082223516:role/CodeDeployServiceRole"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "my-deploy-serverless-code",
+            "Export": {
+              "Name": "sls-deploy-demo-ec2-dev-ServerlessDeploymentBucketName"
+            }
+          }
+        }
+      }
+    },
+    "custom": {
+      "stage": "dev",
+      "region": "us-east-1",
+      "config": {
+        "dev": {
+          "aws_account_id": "785082223516",
+          "image_id": "ami-07a53499a088e4a8c",
+          "instance_type": "t2.micro",
+          "security_group_ids": "sg-0efa280a574305fc5"
+        },
+        "default": {
+          "key-name": "deploykey"
+        }
+      }
+    },
+    "pluginsData": {},
+    "functions": {},
+    "resources": {
+      "Resources": {
+        "SpeiEC2Instance": {
+          "Type": "AWS::EC2::Instance",
+          "Properties": {
+            "AvailabilityZone": {
+              "Fn::Select": [
+                0,
+                {
+                  "Fn::GetAZs": ""
+                }
+              ]
+            },
+            "ImageId": "ami-07a53499a088e4a8c",
+            "InstanceType": "t2.micro",
+            "IamInstanceProfile": "EC2InstanceRoleForCodeDeploy",
+            "KeyName": "deploykey",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "DeployDemo"
+              }
+            ],
+            "SecurityGroupIds": [
+              "sg-0efa280a574305fc5"
+            ]
+          }
+        },
+        "DeployApplication": {
+          "Type": "AWS::CodeDeploy::Application",
+          "Properties": {
+            "ApplicationName": "demo-deploy-application",
+            "ComputePlatform": "Server"
+          }
+        },
+        "DeploymentGroup": {
+          "Type": "AWS::CodeDeploy::DeploymentGroup",
+          "Properties": {
+            "ApplicationName": {
+              "Ref": "DeployApplication"
+            },
+            "DeploymentGroupName": "demo-deploy-deployment-group",
+            "DeploymentStyle": {
+              "DeploymentOption": "WITHOUT_TRAFFIC_CONTROL",
+              "DeploymentType": "IN_PLACE"
+            },
+            "DeploymentConfigName": "CodeDeployDefault.AllAtOnce",
+            "Ec2TagFilters": [
+              {
+                "Key": "STAGE",
+                "Value": "dev",
+                "Type": "KEY_AND_VALUE"
+              }
+            ],
+            "ServiceRoleArn": "arn:aws:iam::785082223516:role/CodeDeployServiceRole"
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "initialServerlessConfig": {
+      "service": "deploy-demo-ec2",
+      "frameworkVersion": "^3.17.0",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      }
+    },
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false
+  },
+  "package": {
+    "artifactDirectoryName": "deploy-demo/deploy-demo-ec2/deploy-demo-ec2/dev/1666505134172-2022-10-23T06:05:34.172Z",
+    "artifact": ""
+  }
+}

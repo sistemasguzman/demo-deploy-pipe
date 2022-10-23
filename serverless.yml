@@ -1,0 +1,68 @@
+service: deploy-demo-ec2
+frameworkVersion: ^3.17.0
+
+provider:
+  name: aws
+  region: ${self:custom.region}
+  stackName: ${self:service}-${opt:user, self:custom.stage}
+  iam:
+    deploymentRole: arn:aws:iam::${self:custom.config.${self:custom.stage}.aws_account_id}:role/GBMAWSCloudFormationExecutionRole
+  stage: ${opt:stage}
+  deploymentBucket:
+    name: my-deploy-serverless-code
+  deploymentPrefix: deploy-demo/${self:service}
+
+custom:
+  stage: ${opt:stage}
+  region: us-east-1
+  config:
+    dev:
+      aws_account_id: "785082223516"
+      image_id: ami-07a53499a088e4a8c
+      instance_type: t2.micro
+      security_group_ids: sg-0efa280a574305fc5
+    default:
+      key-name: deploykey
+
+resources:
+  Resources:
+    SpeiEC2Instance:
+      Type: AWS::EC2::Instance
+      Properties:
+        AvailabilityZone:
+          Fn::Select:
+          - 0
+          - Fn::GetAZs: ''
+        ImageId: ${self:custom.config.${self:provider.stage}.image_id}
+        InstanceType: ${self:custom.config.${self:provider.stage}.instance_type}
+        # SubnetId: ${cf:cash-vpc-${self:custom.stage}.LegacyServicesSubnetAZ1}
+        IamInstanceProfile: EC2InstanceRoleForCodeDeploy
+        # PrivateIpAddress: ${self:custom.config.${self:provider.stage}.private_ip}
+        KeyName: ${self:custom.config.default.key-name}
+        Tags:
+        - Key: Name
+          Value: DeployDemo
+        SecurityGroupIds: 
+          - ${self:custom.config.${self:provider.stage}.security_group_ids}
+
+    DeployApplication:
+      Type: AWS::CodeDeploy::Application
+      Properties:
+        ApplicationName: demo-deploy-application
+        ComputePlatform: Server
+
+    DeploymentGroup:
+      Type: AWS::CodeDeploy::DeploymentGroup
+      Properties:
+        ApplicationName: 
+          Ref: DeployApplication
+        DeploymentGroupName: demo-deploy-deployment-group
+        DeploymentStyle:
+          DeploymentOption: WITHOUT_TRAFFIC_CONTROL
+          DeploymentType: IN_PLACE
+        DeploymentConfigName: CodeDeployDefault.AllAtOnce
+        Ec2TagFilters:
+          - Key: STAGE
+            Value: ${self:provider.stage}
+            Type: KEY_AND_VALUE
+        ServiceRoleArn: arn:aws:iam::${self:custom.config.${self:custom.stage}.aws_account_id}:role/CodeDeployServiceRole
