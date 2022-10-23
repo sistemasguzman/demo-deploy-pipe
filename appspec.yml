@@ -3,6 +3,8 @@ os: windows
 files:
   - source: /
     destination: /var/www/html/
+  - source: services/deploy/DeployApi/
+    destination: /var/www/deploy-api
 # hooks:
 #   BeforeInstall:
 #     - location: scripts/install_dependencies.sh
