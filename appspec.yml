@@ -4,7 +4,7 @@ files:
   - source: /
     destination: /var/www/html/
   - source: services/deploy/DeployApi/
-    destination: /var/www/deploy-api
+    destination: /inetpub/wwwroot/spei-web-api
 # hooks:
 #   BeforeInstall:
 #     - location: scripts/install_dependencies.sh
