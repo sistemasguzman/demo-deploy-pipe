@@ -27,3 +27,9 @@ variable "codebuild_role_arn" {
   description = "describe your variable"
   default = "arn:aws:iam::785082223516:role/service-role/codebuild-code-builde-pipe-service-role"
 }
+
+variable "buildspec_path" {
+  type = string
+  description = "describe your variable"
+  default = "buildspec.yml"
+}

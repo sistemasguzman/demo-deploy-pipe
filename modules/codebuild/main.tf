@@ -25,8 +25,7 @@ resource "aws_codebuild_project" "lab_codebuild_project" {
 
   source {
     type            = "CODEPIPELINE"
-    location        = var.bucket
-    git_clone_depth = 1
+    buildspec = var.buildspec_path
   }
 
   tags = {
